@@ -7,11 +7,15 @@ requirejs.config({
   shim: {
     'Phaser': {
       exports: 'Phaser'
+    },
+    'io': {
+      exports: 'io'
     }
 
   },
   paths: {
-    'Phaser': '../vendor/phaser.min'
+    'Phaser': '../vendor/phaser.min',
+    'io': '../vendor/socket.io'
   }
 });
 
