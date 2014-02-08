@@ -1,4 +1,4 @@
-{
+nom{
   "name": "ships",
   "version": "0.0.1",
   "description": "A game of ships",
@@ -9,7 +9,7 @@
   "dependencies": {
     "express": "3.x",
     "socket.io":"*"
-  },
+  }
   "repository": "",
   "author": "",
   "license": "MIT"

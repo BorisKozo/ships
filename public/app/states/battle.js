@@ -3,9 +3,18 @@ define(['Phaser','io', 'app/game.js', 'app/global.js'], function (Phaser, io, ga
    
   var cursors;
   var player;
+  var serverState = null;
   
-  var socket = io.connect('http://blackwater-bay-nodejs-64270.euw1.nitrousbox.com:3000/');
+  var socket = io.connect('http://ships.cloudapp.net:8000/');
 
+  function updateFromServerState(state){
+    if (!state) {
+      return;
+    }
+    player.x = state[0].x || player.x;
+    player.y = state[0].y || player.y;
+    player.angle = state[0].angle || player.angle;
+  }
   
   var battle = {
 
@@ -17,26 +26,32 @@ define(['Phaser','io', 'app/game.js', 'app/global.js'], function (Phaser, io, ga
       cursors = game.input.keyboard.createCursorKeys();
       player = game.add.sprite(200, 200,'ship');
       player.anchor.setTo(0.5,0.8);
-      socket.emit('init', {
+      socket.emit('client-initialize', {
         x:player.x, 
         y:player.y,
         angle:player.angle
-      }); 
+      });
+      
+      socket.on('server-state',function(state){
+        serverState = state;
+      });
     },
 
     update: function () {
-        //  For example this checks if the up or down keys are pressed and moves the camera accordingly.
+    	
+      updateFromServerState(serverState);
+      serverState = null;
     if (cursors.up.isDown)
     {
     }
 
     if (cursors.left.isDown)
     {
-      //player.angle-=1;
+      socket.emit('client-keys-pressed',{key:'left'});
     }
     else if (cursors.right.isDown)
     {
-      //player.angle+=1;
+      socket.emit('client-keys-pressed',{key:'right'});
         }
     }
   };

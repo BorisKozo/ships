@@ -8,12 +8,19 @@ module.exports = (function(){
     this.socket = socket;
     this.id = id;
     this.socket.player = this;
-    this.socket.on('init',function(data){
+    this.socket.on('client-initialize',function(data){
       this.player.initialize(data);
     });
-//    socket.on('client-message', function (data) {
-//      socketServer.sockets.emit('server-message', data);
-//  });
+    socket.on('client-keys-pressed', function (data) {
+      if (data.key==='right'){
+        this.player.angle+=1;
+      }
+      if (data.key === 'left'){
+        this.player.angle-=1;
+      }
+      
+      console.log("keys pressed ",data);
+   });
 
   }
   
@@ -21,7 +28,16 @@ module.exports = (function(){
     this.x = data.x;
     this.y = data.y;
     this.angle = data.angle;
-  }
+  };
+  
+  Player.prototype.getCurrentState = function(){
+    return {
+  	  x:this.x,
+  	  y:this.y,
+  	  angle:this.angle
+  	}
+  };
+  
   
   var players = {
     addPlayer: function(socket){
@@ -37,8 +53,16 @@ module.exports = (function(){
             return;
           }
         }
-      }
+      });
+    },
+    getCurrentState: function(){
+    	var result = [];
+    	var i;
+    	for (i=0; i<playerList.length;i++){
+    		result.push(playerList[i].getCurrentState());
+    	}
+    	return result;
     }
-  }
-  return players
-})();
+  };
+  return players;
+}());

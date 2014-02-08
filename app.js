@@ -4,15 +4,12 @@ var io = require('socket.io');
 var app = express();
 var server = http.createServer(app);
 var socketServer = io.listen(server);
-var players = require('./server/players');
+var game = require('./server/game');
 
 app.use(express.static(__dirname + '/public'));
 
+game.initialize(socketServer);
 
 
-socketServer.sockets.on('connection', function (socket) {
-  players.addPlayer(socket);
-});
-
-server.listen(3000);
-console.log("Starting server on port 3000");
+server.listen(8000);
+console.log("Starting server on port 8000");
