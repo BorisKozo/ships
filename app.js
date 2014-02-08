@@ -7,7 +7,7 @@ var socketServer = io.listen(server);
 var game = require('./server/game');
 
 app.use(express.static(__dirname + '/public'));
-
+socketServer.set('log level', 1);
 game.initialize(socketServer);
 
 

@@ -9,9 +9,6 @@ module.exports = (function() {
     }
 
     function attachSocketHandlers(player){
-              player.socket.on('client-initialize', function(data) {
-            this.player.initialize(data);
-        });
         
         player.socket.on('client-keys-pressed', function(keys) {
             if (keys.right) {
@@ -42,10 +39,16 @@ module.exports = (function() {
 
     }
 
-    Player.prototype.initialize = function(data) {
-        this.x = data.x;
-        this.y = data.y;
-        this.rotation = data.rotation;
+    Player.prototype.initialize = function() {
+        this.x = 200;
+        this.y = 200;
+        this.rotation = 0;
+        console.log("Initialized player - ",this.id);
+        this.socket.emit("server-initialize",{
+          x:this.x,
+          y:this.y,
+          rotation:this.rotation
+        });
     };
 
     Player.prototype.getCurrentState = function() {
@@ -61,6 +64,10 @@ module.exports = (function() {
         addPlayer: function(socket) {
             var player = new Player(socket);
             playerList.push(player);
+           
+            socket.on('client-ready', function(){
+              player.initialize();
+            });
 
             socket.on('disconnect', function() {
                 var i;
