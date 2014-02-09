@@ -13,7 +13,8 @@ var game = {
 	initialize: function(socket){
 	   socketServer = socket;
        socketServer.sockets.on('connection', function (socket) {
-           players.addPlayer(socket);
+           var player = players.addPlayer(socket);
+           socket.broadcast.emit('server-player-connected',player.getCurrentState());
         });
         
         setInterval(gameLoop,16);

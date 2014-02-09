@@ -2,14 +2,18 @@ module.exports = (function() {
     var playerList = [];
     var id = 0;
 
-    function initializeConstants(player){
-      player.metadata = {
-        topSpeed:1
-      };
+    function initializeConstants(player) {
+        player.metadata = {
+            topSpeed: 2
+        };
+
+        player.x = 200;
+        player.y = 200;
+        player.rotation = 0;
     }
 
-    function attachSocketHandlers(player){
-        
+    function attachSocketHandlers(player) {
+
         player.socket.on('client-keys-pressed', function(keys) {
             if (keys.right) {
                 this.player.rotation += 0.02;
@@ -18,16 +22,16 @@ module.exports = (function() {
                     this.player.rotation -= 0.02;
                 }
             }
-            
-            if (keys.up){
-              this.player.x += Math.cos(this.player.rotation)*this.player.metadata.topSpeed;
-              this.player.y += Math.sin(this.player.rotation)*this.player.metadata.topSpeed;
+
+            if (keys.up) {
+                this.player.x += Math.cos(this.player.rotation) * this.player.metadata.topSpeed;
+                this.player.y += Math.sin(this.player.rotation) * this.player.metadata.topSpeed;
             }
 
             console.log("keys pressed ", keys);
         });
     }
-    
+
     function Player(socket) {
         id++;
         this.socket = socket;
@@ -40,22 +44,17 @@ module.exports = (function() {
     }
 
     Player.prototype.initialize = function() {
-        this.x = 200;
-        this.y = 200;
-        this.rotation = 0;
-        console.log("Initialized player - ",this.id);
-        this.socket.emit("server-initialize",{
-          x:this.x,
-          y:this.y,
-          rotation:this.rotation
-        });
+
+        console.log("Initialized player - ", this.id);
+        this.socket.emit("server-initialize", this.getCurrentState());
     };
 
     Player.prototype.getCurrentState = function() {
         return {
             x: this.x,
             y: this.y,
-            rotation: this.rotation
+            rotation: this.rotation,
+            id: this.id
         };
     };
 
@@ -64,9 +63,9 @@ module.exports = (function() {
         addPlayer: function(socket) {
             var player = new Player(socket);
             playerList.push(player);
-           
-            socket.on('client-ready', function(){
-              player.initialize();
+
+            socket.on('client-ready', function() {
+                player.initialize();
             });
 
             socket.on('disconnect', function() {
@@ -79,6 +78,8 @@ module.exports = (function() {
                     }
                 }
             });
+
+            return player;
         },
         getCurrentState: function() {
             var result = [];
