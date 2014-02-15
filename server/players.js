@@ -1,6 +1,8 @@
 module.exports = (function() {
+    var players;
     var playerList = [];
     var id = 0;
+
 
     function initializeConstants(player) {
         player.metadata = {
@@ -46,7 +48,10 @@ module.exports = (function() {
     Player.prototype.initialize = function() {
 
         console.log("Initialized player - ", this.id);
-        this.socket.emit("server-initialize", this.getCurrentState());
+        this.socket.emit("server-initialize", {
+          id:this.id,
+          data:players.getCurrentState()
+          });
     };
 
     Player.prototype.getCurrentState = function() {
@@ -59,7 +64,7 @@ module.exports = (function() {
     };
 
 
-    var players = {
+    players = {
         addPlayer: function(socket) {
             var player = new Player(socket);
             playerList.push(player);
@@ -74,9 +79,10 @@ module.exports = (function() {
                     if (playerList[i] && playerList[i].id === player.id) {
                         playerList.splice(i, 1);
                         console.log("Deleted player " + player.id);
-                        return;
+                        break;
                     }
                 }
+                socket.broadcast.emit('server-player-disconnected',{id:player.id});
             });
 
             return player;

@@ -5,25 +5,26 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
     var player;
     var enemies;
     var gameSprites = {}; //I will put all the ship sprites here
-    
+
     var serverState = null;
     var gameStarted = false;
     var initializationPacket = null;
-    var socket = io.connect('http://ships.cloudapp.net:8000/');
+    var socket = io.connect();
 
     function updateFromServerState(state) {
         if (!state) {
             return;
         }
-        var i = 0, sprite;
-        for (i = state.length-1; i >= 0; i--) {
-          sprite = gameSprites[state[i].id];
-          if (!sprite){
-            continue;
-          }
-          sprite.x = state[i].x;
-          sprite.y = state[i].y;
-          sprite.rotation = state[i].rotation;
+        var i = 0,
+            sprite;
+        for (i = state.length - 1; i >= 0; i--) {
+            sprite = gameSprites[state[i].id];
+            if (!sprite) {
+                continue;
+            }
+            sprite.x = state[i].x;
+            sprite.y = state[i].y;
+            sprite.rotation = state[i].rotation;
         }
     }
 
@@ -48,6 +49,14 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
         }
     }
 
+    function createEnemy(data) {
+        var enemy = enemies.create(data.x, data.y, 'ship');
+        enemy.anchor.setTo(0.2, 0.5);
+        enemy.rotation = data.rotation;
+        enemy.serverId = data.id;
+        gameSprites[data.id] = enemy;
+    }
+
     var battle = {
 
         preload: function() {
@@ -67,10 +76,20 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
             });
 
             socket.on('server-initialize', function(data) {
-                player.reset(data.x, data.y);
-                player.rotation = data.rotation;
+                var i;
                 player.serverId = data.id;
-                gameSprites[data.id] = player;
+                for (i = 0; i < data.data.length; i++) {
+                    if (data.data[i].id === player.serverId) {
+                        player.reset(data.data[i].x, data.data[i].y);
+                        player.rotation = data.data[i].rotation;
+                        gameSprites[data.id] = player;
+
+                    } else {
+                        createEnemy(data.data[i]);
+                    }
+
+                }
+
                 gameStarted = true;
             });
 
@@ -80,6 +99,14 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
                 enemy.rotation = data.rotation;
                 enemy.serverId = data.id;
                 gameSprites[data.id] = enemy;
+            });
+            
+            socket.on('server-player-disconnected', function(data){
+              var enemy = gameSprites[data.id];
+              if (enemy){
+                enemy.kill();
+              }
+              delete gameSprites[data.id];
             });
 
             socket.emit("client-ready"); //Signal the server that this client is ready to accept data
