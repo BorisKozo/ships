@@ -1,5 +1,4 @@
-define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function(Phaser, io, math, game, global) {
-
+define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js'], function(Phaser, io, math, game, global, logic) {
 
     var cursors;
     var player;
@@ -39,9 +38,11 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
         if (cursors.left.isDown) {
             keys.left = true;
             toSend = true;
+            logic.rotateLeft(player);
         } else if (cursors.right.isDown) {
             keys.right = true;
             toSend = true;
+            logic.rotateRight(player);
         }
 
         if (toSend) {
@@ -50,7 +51,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
     }
 
     function createEnemy(data) {
-        var enemy = enemies.create(data.x, data.y, 'ship');
+        var enemy = enemies.create(data.x, data.y, 'enemy-ship');
         enemy.anchor.setTo(0.2, 0.5);
         enemy.rotation = data.rotation;
         enemy.serverId = data.id;
@@ -60,13 +61,14 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
     var battle = {
 
         preload: function() {
-            game.load.image('ship', 'assets/sprites/ship.png');
+            game.load.image('player-ship', 'assets/sprites/player.png');
+            game.load.image('enemy-ship', 'assets/sprites/ship.png');
             game.stage.disableVisibilityChange = true;
         },
 
         create: function() {
             cursors = game.input.keyboard.createCursorKeys();
-            player = game.add.sprite(0, 0, 'ship');
+            player = game.add.sprite(0, 0, 'player-ship');
             player.anchor.setTo(0.2, 0.5);
             player.kill();
             enemies = game.add.group();
@@ -94,19 +96,19 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js'], function
             });
 
             socket.on('server-player-connected', function(data) { //This happens when other player connects
-                var enemy = enemies.create(data.x, data.y, 'ship');
+                var enemy = enemies.create(data.x, data.y, 'enemy-ship');
                 enemy.anchor.setTo(0.2, 0.5);
                 enemy.rotation = data.rotation;
                 enemy.serverId = data.id;
                 gameSprites[data.id] = enemy;
             });
-            
-            socket.on('server-player-disconnected', function(data){
-              var enemy = gameSprites[data.id];
-              if (enemy){
-                enemy.kill();
-              }
-              delete gameSprites[data.id];
+
+            socket.on('server-player-disconnected', function(data) {
+                var enemy = gameSprites[data.id];
+                if (enemy) {
+                    enemy.kill();
+                }
+                delete gameSprites[data.id];
             });
 
             socket.emit("client-ready"); //Signal the server that this client is ready to accept data

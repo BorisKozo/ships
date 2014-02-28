@@ -1,14 +1,13 @@
+
 module.exports = (function() {
+    var logic = require('./../public/shared/logic');
     var players;
     var playerList = [];
     var id = 0;
 
 
-    function initializeConstants(player) {
-        player.metadata = {
-            topSpeed: 2
-        };
 
+    function initializeConstants(player) {
         player.x = 200;
         player.y = 200;
         player.rotation = 0;
@@ -18,19 +17,18 @@ module.exports = (function() {
 
         player.socket.on('client-keys-pressed', function(keys) {
             if (keys.right) {
-                this.player.rotation += 0.02;
+                logic.rotateRight(this.player);
             } else {
                 if (keys.left) {
-                    this.player.rotation -= 0.02;
+                    logic.rotateLeft(this.player);
                 }
             }
 
             if (keys.up) {
-                this.player.x += Math.cos(this.player.rotation) * this.player.metadata.topSpeed;
-                this.player.y += Math.sin(this.player.rotation) * this.player.metadata.topSpeed;
+                logic.moveForward(this.player);
             }
 
-            console.log("keys pressed ", keys);
+            //console.log("keys pressed ", keys);
         });
     }
 
