@@ -1,4 +1,3 @@
-
 module.exports = (function() {
     var logic = require('./../public/shared/logic');
     var players;
@@ -11,6 +10,7 @@ module.exports = (function() {
         player.x = 200;
         player.y = 200;
         player.rotation = 0;
+        player.shot = null;
     }
 
     function attachSocketHandlers(player) {
@@ -26,6 +26,17 @@ module.exports = (function() {
 
             if (keys.up) {
                 logic.moveForward(this.player);
+            }
+            
+            if (keys.shoot){
+              console.log(logic.canShoot(player));
+              if (logic.canShoot(player)){
+                player.shot = {
+                  x:player.x,
+                  y:player.y,
+                  rotation:player.rotation
+                };
+              }
             }
 
             //console.log("keys pressed ", keys);
@@ -57,8 +68,18 @@ module.exports = (function() {
             x: this.x,
             y: this.y,
             rotation: this.rotation,
-            id: this.id
+            id: this.id,
+            shot: this.shot
         };
+    };
+    
+    Player.prototype.update = function(){
+      if (this.shot){
+        logic.moveShot(this.shot);
+        if (logic.isShotOutOfBounds(this.shot)){
+          this.shot = null;
+        }
+      }
     };
 
 
@@ -92,6 +113,12 @@ module.exports = (function() {
                 result.push(playerList[i].getCurrentState());
             }
             return result;
+        },
+        update: function(){
+            var i;
+            for (i = 0; i < playerList.length; i++) {
+                playerList[i].update();
+            }
         }
     };
     return players;
