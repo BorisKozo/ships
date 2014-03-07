@@ -11,15 +11,15 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
     var initializationPacket = null;
     var socket = io.connect();
 
-    function shoot(sprite, shotData){
-        
+    function shoot(sprite, shotData) {
+
         var shotSprite = shots.create(shotData.x, shotData.y, 'enemy-shot');
         shotSprite.anchor.setTo(0.5, 0.5);
         shotSprite.rotation = shotData.rotation;
         shotSprite.serverId = sprite.serverId;
         sprite.shot = shotSprite;
     }
-    
+
     function updateFromServerState(state) {
         if (!state) {
             return;
@@ -34,19 +34,19 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             sprite.x = state[i].x;
             sprite.y = state[i].y;
             sprite.rotation = state[i].rotation;
-            if (state[i].shot !== null){ //Server thinks there is a shot
-              if (sprite.shot === null){ //But we have no shot
-                shoot(sprite,state[i].shot); //Generate shot
-              } else { // We have a shot
-                sprite.shot.x = state[i].shot.x;
-                sprite.shot.y = state[i].shot.y;
-                
-              }
+            if (state[i].shot !== null) { //Server thinks there is a shot
+                if (sprite.shot === null) { //But we have no shot
+                    shoot(sprite, state[i].shot); //Generate shot
+                } else { // We have a shot
+                    sprite.shot.x = state[i].shot.x;
+                    sprite.shot.y = state[i].shot.y;
+
+                }
             } else { //Server thinks there is no shot
-              if (sprite.shot !== null){ // But we have a shot
-                 sprite.shot.kill();
-                 sprite.shot = null;
-              }
+                if (sprite.shot !== null) { // But we have a shot
+                    sprite.shot.kill();
+                    sprite.shot = null;
+                }
             }
         }
     }
@@ -69,9 +69,9 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             logic.rotateRight(player);
         }
 
-        if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
-          keys.shoot = true;
-          toSend = true;
+        if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+            keys.shoot = true;
+            toSend = true;
         }
 
         if (toSend) {

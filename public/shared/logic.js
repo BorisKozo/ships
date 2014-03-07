@@ -6,8 +6,8 @@
       var shipSpeed = 2;
       var shotSpeed = 5;
        module.exports = {
-         screenWidth : 800,
-         screenHeight : 800,
+         screenWidth : 600,
+         screenHeight : 600,
          
          rotateRight:function(player){
            player.rotation += rotationSpeed;

@@ -1,5 +1,5 @@
-﻿define(['Phaser'],function(Phaser){
-  var game = new Phaser.Game(800,8600, Phaser.CANVAS, '');
+define(['Phaser'],function(Phaser){
+  var game = new Phaser.Game(950,600, Phaser.CANVAS, '');
 
   return game;
 
