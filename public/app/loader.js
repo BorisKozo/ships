@@ -6,7 +6,7 @@ define(['require', 'Phaser', './game.js', 'app/states/battle.js', 'app/states/te
     start: function () {
       game.state.add('Battle', battleState);
       game.state.add('Test', testArea);
-      game.state.start('Test');
+      game.state.start('Battle');
     }
   };
 

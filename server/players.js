@@ -7,8 +7,8 @@ module.exports = (function() {
 
 
     function initializeConstants(player) {
-        player.x = 200;
-        player.y = 200;
+        player.x = 0;
+        player.y = 0;
         player.rotation = 0;
         player.shot = null;
     }
@@ -29,7 +29,6 @@ module.exports = (function() {
             }
             
             if (keys.shoot){
-              console.log(logic.canShoot(player));
               if (logic.canShoot(player)){
                 player.shot = {
                   x:player.x,
