@@ -6,7 +6,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js','shared/lo
     var TouchButton = function(x, y) {
         this.sprite = game.add.sprite(x, y, 'button', 0);
         this.sprite.anchor.setTo(0.5, 0.5);
-        this.squaredRadius = Math.pow(this.sprite.width / 2, 2);
+        this.squaredRadius = Math.pow((this.sprite.width / 2)*1.5, 2); //increase the hit area by 50%
         this.isPressed = false;
         this.numberOfPointers = 2;
     };
@@ -30,11 +30,11 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js','shared/lo
     };
 
     function createButtons() {
-        leftButton= new TouchButton(330, 170);
-        upLeftButton = new TouchButton(350, 130);
+        leftButton= new TouchButton(330, 190);
+        upLeftButton = new TouchButton(345, 140);
         upButton = new TouchButton(390, 110);
-        upRightButton= new TouchButton(430, 130);
-        rightButton= new TouchButton(450, 170);
+        upRightButton= new TouchButton(430, 140);
+        rightButton= new TouchButton(445, 190);
         fireButton= new TouchButton(-390, 110);
         
         buttons = [upButton, upLeftButton, leftButton, upRightButton, rightButton, fireButton];
