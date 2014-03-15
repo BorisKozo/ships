@@ -8,7 +8,6 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
 
     var serverState = null;
     var gameStarted = false;
-    //var initializationPacket = null;
     var socket = io.connect();
 
     var upButton, upLeftButton, leftButton, upRightButton, rightButton, fireButton;
@@ -170,7 +169,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             delete gameSprites[data.id];
         });
 
-        socket.emit("client-ready"); //Signal the server that this client is ready to accept data
+        
 
     }
 
@@ -210,6 +209,8 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
 
             createSocketEvents();
             createButtons();
+
+            socket.emit("client-ready",{name: document.URL.split('#')[1]}); //Signal the server that this client is ready to accept data
         },
 
         update: function() {

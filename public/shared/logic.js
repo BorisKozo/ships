@@ -11,6 +11,26 @@
         var rotationSpeed = 0.02;
         var shipSpeed = 2;
         var shotSpeed = 5;
+        
+        function clipTpWorld(player){
+                if (player.x < module.exports.world.left){
+                    player.x = module.exports.world.left + shipSpeed;
+                }
+                
+                if (player.x > module.exports.world.right){
+                    player.x = module.exports.world.right - shipSpeed;
+                    console.log(player.x);
+                }
+
+                if (player.y < module.exports.world.top){
+                    player.y = module.exports.world.top + shipSpeed;
+                }
+                
+                if (player.y > module.exports.world.bottom){
+                    player.y = module.exports.world.bottom - shipSpeed;
+                }
+        }
+        
         module.exports = {
             world: {
                 left: -300,
@@ -27,7 +47,8 @@
             moveForward: function(player) {
                 player.x += Math.cos(player.rotation) * shipSpeed;
                 player.y += Math.sin(player.rotation) * shipSpeed;
-
+                
+                clipTpWorld(player);
             },
             canShoot: function(player) {
                 return player.shot === null;
@@ -38,8 +59,8 @@
 
             },
             isShotOutOfBounds: function(shot) {
-                if (shot.x < module.exports.world.left - 5 || shot.x > module.exports.world.right + 5) return true;
-                if (shot.y < module.exports.world.top - 5 || shot.y > module.exports.world.bottom + 5) return true;
+                if (shot.x < module.exports.world.left - shotSpeed || shot.x > module.exports.world.right + shotSpeed) return true;
+                if (shot.y < module.exports.world.top - shotSpeed || shot.y > module.exports.world.bottom + shotSpeed) return true;
                 return false;
             }
 

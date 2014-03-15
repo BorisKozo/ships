@@ -53,11 +53,12 @@ module.exports = (function() {
 
     }
 
-    Player.prototype.initialize = function() {
-
-        console.log("Initialized player - ", this.id);
-        this.socket.emit("server-initialize", {
+    Player.prototype.initialize = function(data) {
+        var name = data.name ? data.name : 'player '+this.id;
+        console.log('Initialized player - ', name," (", this.id,')');
+        this.socket.emit('server-initialize', {
           id:this.id,
+          name:name,
           data:players.getCurrentState()
           });
     };
@@ -87,8 +88,8 @@ module.exports = (function() {
             var player = new Player(socket);
             playerList.push(player);
 
-            socket.on('client-ready', function() {
-                player.initialize();
+            socket.on('client-ready', function(data) {
+                player.initialize(data);
             });
 
             socket.on('disconnect', function() {
