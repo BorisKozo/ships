@@ -9,9 +9,20 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
     var serverState = null;
     var gameStarted = false;
     var socket = io.connect();
+    var stats = [];
 
     var upButton, upLeftButton, leftButton, upRightButton, rightButton, fireButton;
     var buttons;
+
+    var fontStyle = {
+        font: "22px Arial",
+        fill: "#00FF44",
+        align: "left"
+    };
+
+
+
+
     var TouchButton = function(x, y) {
         this.sprite = game.add.sprite(x, y, 'button', 0);
         this.sprite.anchor.setTo(0.5, 0.5);
@@ -73,6 +84,9 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             sprite.x = state[i].x;
             sprite.y = state[i].y;
             sprite.rotation = state[i].rotation;
+            sprite.name = state[i].name;
+            sprite.score = state[i].score;
+            sprite.hp = state[i].hp;
             if (state[i].shot !== null) { //Server thinks there is a shot
                 if (sprite.shot === null) { //But we have no shot
                     shoot(sprite, state[i].shot); //Generate shot
@@ -125,12 +139,39 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
         }
     }
 
+    function recalculateStats() { //update all the player stats based on the current data
+        var text, count = 0,
+            textSprite;
+
+        for (var id in gameSprites) {
+            if (gameSprites.hasOwnProperty(id)) {
+                if (gameSprites[id].name) {
+                    text = gameSprites[id].name + " - " + gameSprites[id].score;
+                } else {
+                    text = "Connecting..."
+                }
+                textSprite = stats[count];
+                //if (textSprite === -1){
+                if (count === stats.length) {
+                    break;
+                }
+                textSprite.x = 307;
+                textSprite.y = 30 * count + 10 + logic.world.top;
+                textSprite.setText(text);
+                count++;
+            }
+        }
+    }
+
     function createEnemy(data) {
         var enemy = enemies.create(data.x, data.y, 'enemy-ship');
         enemy.anchor.setTo(0.2, 0.5);
         enemy.rotation = data.rotation;
         enemy.serverId = data.id;
         enemy.shot = null;
+        enemy.hp = data.hp;
+        enemy.score = data.score;
+        enemy.name = data.name;
         gameSprites[data.id] = enemy;
     }
 
@@ -151,6 +192,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
                 } else {
                     createEnemy(data.data[i]);
                 }
+                stats.push(game.add.text(0, 0, '', fontStyle));
 
             }
 
@@ -159,6 +201,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
 
         socket.on('server-player-connected', function(data) { //This happens when other player connects
             createEnemy(data);
+            stats.push(game.add.text(0, 0, '', fontStyle));
         });
 
         socket.on('server-player-disconnected', function(data) {
@@ -167,9 +210,11 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
                 enemy.kill();
             }
             delete gameSprites[data.id];
+            stats[stats.length - 1].destroy();
+            stats.pop();
         });
 
-        
+
 
     }
 
@@ -210,7 +255,9 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             createSocketEvents();
             createButtons();
 
-            socket.emit("client-ready",{name: document.URL.split('#')[1]}); //Signal the server that this client is ready to accept data
+            socket.emit("client-ready", {
+                name: document.URL.split('#')[1]
+            }); //Signal the server that this client is ready to accept data
         },
 
         update: function() {
@@ -220,6 +267,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             updateFromServerState(serverState);
             serverState = null;
             handleKeys();
+            recalculateStats();
         }
     };
 

@@ -11,6 +11,8 @@ module.exports = (function() {
         player.y = 0;
         player.rotation = 0;
         player.shot = null;
+        player.score = 0;
+        player.hp = 100;
     }
 
     function attachSocketHandlers(player) {
@@ -54,11 +56,11 @@ module.exports = (function() {
     }
 
     Player.prototype.initialize = function(data) {
-        var name = data.name ? data.name : 'player '+this.id;
+        var name = data.name ? data.name : 'Player '+this.id;
+        this.name = name;
         console.log('Initialized player - ', name," (", this.id,')');
         this.socket.emit('server-initialize', {
           id:this.id,
-          name:name,
           data:players.getCurrentState()
           });
     };
@@ -69,7 +71,10 @@ module.exports = (function() {
             y: this.y,
             rotation: this.rotation,
             id: this.id,
-            shot: this.shot
+            shot: this.shot,
+            hp: this.hp,
+            score:this.score,
+            name:this.name
         };
     };
     
