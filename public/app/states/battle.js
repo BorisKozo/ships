@@ -1,4 +1,4 @@
-define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js'], function(Phaser, io, math, game, global, logic) {
+define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js','./../sprites/ship'], function(Phaser, io, math, game, global, logic, Ship) {
 
     var cursors;
     var player;
@@ -39,7 +39,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             pointer = game.input["pointer" + i.toString()];
             if (pointer) {
                 if (pointer.isDown) {
-                    if (math.distanceSquared(pointer.worldX, pointer.worldY, this.sprite.worldCenterX, this.sprite.worldCenterY) < this.squaredRadius) {
+                    if (math.distanceSquared(pointer.worldX, pointer.worldY, this.sprite.world.x, this.sprite.world.y) < this.squaredRadius) {
                         this.sprite.frame = 1;
                         this.isPressed = true;
                         break;
@@ -116,17 +116,17 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
         if (cursors.up.isDown || upButton.isPressed || upLeftButton.isPressed || upRightButton.isPressed) {
             keys.up = true;
             toSend = true;
-            logic.moveForward(player);
+            player.moveForward();
         }
 
         if (cursors.left.isDown || leftButton.isPressed || upLeftButton.isPressed) {
             keys.left = true;
             toSend = true;
-            logic.rotateLeft(player);
+            player.rotateLeft();
         } else if (cursors.right.isDown || rightButton.isPressed || upRightButton.isPressed) {
             keys.right = true;
             toSend = true;
-            logic.rotateRight(player);
+            player.rotateRight();
         }
 
         if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || fireButton.isPressed) {
@@ -185,8 +185,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             player.serverId = data.id;
             for (i = 0; i < data.data.length; i++) {
                 if (data.data[i].id === player.serverId) {
-                    player.reset(data.data[i].x, data.data[i].y);
-                    player.rotation = data.data[i].rotation;
+                    player.reset(data.data[i].x, data.data[i].y,data.data[i].rotation);
                     gameSprites[data.id] = player;
 
                 } else {
@@ -223,23 +222,19 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
         preload: function() {
             game.world.setBounds(-2000, -2000, 4000, 4000);
 
-            game.load.image('player-ship', 'assets/sprites/player-ship.png');
-            game.load.image('enemy-ship', 'assets/sprites/enemy-ship.png');
-            game.load.image('player-shot', 'assets/sprites/player-shot.png');
-            game.load.image('enemy-shot', 'assets/sprites/enemy-shot.png');
             game.load.image('bound', 'assets/sprites/bound.png');
             game.load.spritesheet('button', 'assets/buttons/button.png', 45, 45);
-
             game.stage.disableVisibilityChange = true;
+            
+            Ship.preload();
         },
 
         create: function() {
             game.add.sprite(-300, -300, 'bound');
             cursors = game.input.keyboard.createCursorKeys();
-            player = game.add.sprite(0, 0, 'player-ship');
-            player.anchor.setTo(0.2, 0.5);
-            player.kill();
-            player.shot = null;
+            player = new Ship();
+            player.create('player');
+            
             enemies = game.add.group();
             shots = game.add.group();
 

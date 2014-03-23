@@ -6,6 +6,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js','shared/lo
     var TouchButton = function(x, y) {
         this.sprite = game.add.sprite(x, y, 'button', 0);
         this.sprite.anchor.setTo(0.5, 0.5);
+        //this.sprite.inputEnabled = true;
         this.squaredRadius = Math.pow((this.sprite.width / 2)*1.5, 2); //increase the hit area by 50%
         this.isPressed = false;
         this.numberOfPointers = 2;
@@ -19,7 +20,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js','shared/lo
             pointer = game.input["pointer" + i.toString()];
             if (pointer) {
                 if (pointer.isDown) {
-                    if (math.distanceSquared(pointer.worldX, pointer.worldY, this.sprite.worldCenterX, this.sprite.worldCenterY) < this.squaredRadius) {
+                    if (math.distanceSquared(pointer.worldX, pointer.worldY, this.sprite.world.x, this.sprite.world.y) < this.squaredRadius) {
                         this.sprite.frame = 1;
                         this.isPressed = true;
                         break;
@@ -93,8 +94,8 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js','shared/lo
 
         render: function() {
             //game.debug.renderCameraInfo(game.camera, 32, 32);
-            game.debug.renderPointer(game.input.pointer1);
-            game.debug.renderPointer(game.input.pointer2);
+            game.debug.pointer(game.input.pointer1);
+            game.debug.pointer(game.input.pointer2);
         }
     };
 
