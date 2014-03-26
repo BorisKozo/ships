@@ -1,7 +1,27 @@
-define(['Phaser', 'app/game.js', 'shared/logic.js'], function(Phaser, game, logic) {
+define(['Phaser', 'app/game.js', 'shared/logic.js', './hp_bar'], function(Phaser, game, logic, HpBar) {
     'use strict';
 
-    return {
+    var ship = {
+        hpBarDx: -10,
+        hpBarDy: -32,
+        hpBarWidth: 30,
+        updateHpBar: function(){
+            this.hpBar.moveTo(this.ship.x+this.hpBarDx, this.ship.y+this.hpBarDy);
+            this.hpBar.hp = this.hp;
+        },
+        create: function() {
+            this.hpBar = new HpBar();
+            this.hpBar.create(ship.hpBarDx, ship.hpBarDy, ship.hpBarWidth, 100);
+            if (this._create) {
+                this._create.apply(this, Array.prototype.slice.call(arguments));
+            }
+        },
+        update: function() {
+            this.hpBar.update();
+            if (this._update) {
+                this._update.apply(this, Array.prototype.slice.call(arguments));
+            }
+        },
         updateState: function(state) {
             this.ship.x = state.x;
             this.ship.y = state.y;
@@ -23,6 +43,8 @@ define(['Phaser', 'app/game.js', 'shared/logic.js'], function(Phaser, game, logi
                     this.shot = null;
                 }
             }
+            
+            this.updateHpBar();
 
         },
         shoot: function(shotData) {
@@ -34,4 +56,6 @@ define(['Phaser', 'app/game.js', 'shared/logic.js'], function(Phaser, game, logi
             this.shot = shotSprite;
         }
     }
+    
+    return ship;
 });

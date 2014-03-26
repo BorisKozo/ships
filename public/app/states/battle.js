@@ -1,4 +1,4 @@
-define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js','./../sprites/player_ship','./../sprites/enemy_ship'], function(Phaser, io, math, game, global, logic, PlayerShip, EnemyShip) {
+define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js', './../sprites/player_ship', './../sprites/enemy_ship'], function(Phaser, io, math, game, global, logic, PlayerShip, EnemyShip) {
 
     var cursors;
     var player;
@@ -150,7 +150,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             player.serverId = data.id;
             for (i = 0; i < data.data.length; i++) {
                 if (data.data[i].id === player.serverId) {
-                    player.reset(data.data[i].x, data.data[i].y,data.data[i].rotation);
+                    player.reset(data.data[i].x, data.data[i].y, data.data[i].rotation);
                     gameSprites[data.id] = player;
 
                 } else {
@@ -190,7 +190,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             game.load.image('bound', 'assets/sprites/bound.png');
             game.load.spritesheet('button', 'assets/buttons/button.png', 45, 45);
             game.stage.disableVisibilityChange = true;
-            
+
             PlayerShip.preload();
             EnemyShip.preload();
         },
@@ -200,7 +200,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             cursors = game.input.keyboard.createCursorKeys();
             player = new PlayerShip();
             player.create();
-            
+
             enemies = game.add.group();
             shots = game.add.group();
 
@@ -228,6 +228,11 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             updateFromServerState(serverState);
             serverState = null;
             handleKeys();
+            for (var id in gameSprites) {
+                if (gameSprites.hasOwnProperty(id)) {
+                    gameSprites[id].update()
+                }
+            }
             recalculateStats();
         }
     };

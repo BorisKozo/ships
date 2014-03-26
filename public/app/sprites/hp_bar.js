@@ -1,4 +1,4 @@
-define(['Phaser'], function(Phaser) {
+define(['Phaser','app/game.js'], function(Phaser,game) {
     'use strict';
     
     var greenColor = 0x00FF00;
@@ -6,17 +6,14 @@ define(['Phaser'], function(Phaser) {
     var redColor = 0xFF0000;
 
     function create(x, y, width, maxHp) {
-        this.hpBar = this.game.add.graphics(x, y);
+        this.hpBar = game.add.graphics(x, y);
         this.hp = maxHp;
         this.maxHp = maxHp;
         this.width = width;
 
     }
 
-    function reset(x, y, width, maxHp) {
-        this.hp = maxHp;
-        this.maxHp = maxHp;
-        this.width = width;
+    function moveTo(x, y) {
         this.hpBar.x = x;
         this.hpBar.y = y;
     }
@@ -41,11 +38,9 @@ define(['Phaser'], function(Phaser) {
 
     }
 
-    var HpBar = function(game) {
-        this.game = game;
-
+    var HpBar = function() {
         this.create = create;
-        this.reset = reset;
+        this.moveTo = moveTo;
         this.update = update;
     };
 

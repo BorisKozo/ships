@@ -25,10 +25,13 @@ define(['Phaser', 'app/game.js', 'shared/logic.js','./ship'], function(Phaser, g
             this.shot = null;
         }
     }
+    
+
 
     var Ship = function() {
-        this.create = create;
+        this._create = create;
         this.destroy = destroy;
+
     };
 
     Ship.preload = preload;
