@@ -1,8 +1,7 @@
-define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js','./../sprites/ship'], function(Phaser, io, math, game, global, logic, Ship) {
+define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js','./../sprites/player_ship','./../sprites/enemy_ship'], function(Phaser, io, math, game, global, logic, PlayerShip, EnemyShip) {
 
     var cursors;
     var player;
-    var enemies;
     var shots;
     var gameSprites = {}; //I will put all the ship sprites here
 
@@ -61,15 +60,6 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
     }
 
 
-    function shoot(sprite, shotData) {
-
-        var shotSprite = shots.create(shotData.x, shotData.y, 'enemy-shot');
-        shotSprite.anchor.setTo(0.5, 0.5);
-        shotSprite.rotation = shotData.rotation;
-        shotSprite.serverId = sprite.serverId;
-        sprite.shot = shotSprite;
-    }
-
     function updateFromServerState(state) {
         if (!state) {
             return;
@@ -81,26 +71,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             if (!sprite) {
                 continue;
             }
-            sprite.x = state[i].x;
-            sprite.y = state[i].y;
-            sprite.rotation = state[i].rotation;
-            sprite.name = state[i].name;
-            sprite.score = state[i].score;
-            sprite.hp = state[i].hp;
-            if (state[i].shot !== null) { //Server thinks there is a shot
-                if (sprite.shot === null) { //But we have no shot
-                    shoot(sprite, state[i].shot); //Generate shot
-                } else { // We have a shot
-                    sprite.shot.x = state[i].shot.x;
-                    sprite.shot.y = state[i].shot.y;
-
-                }
-            } else { //Server thinks there is no shot
-                if (sprite.shot !== null) { // But we have a shot
-                    sprite.shot.kill();
-                    sprite.shot = null;
-                }
-            }
+            sprite.updateState(state[i]);
         }
     }
 
@@ -164,14 +135,8 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
     }
 
     function createEnemy(data) {
-        var enemy = enemies.create(data.x, data.y, 'enemy-ship');
-        enemy.anchor.setTo(0.2, 0.5);
-        enemy.rotation = data.rotation;
-        enemy.serverId = data.id;
-        enemy.shot = null;
-        enemy.hp = data.hp;
-        enemy.score = data.score;
-        enemy.name = data.name;
+        var enemy = new EnemyShip();
+        enemy.create(data);
         gameSprites[data.id] = enemy;
     }
 
@@ -206,7 +171,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
         socket.on('server-player-disconnected', function(data) {
             var enemy = gameSprites[data.id];
             if (enemy) {
-                enemy.kill();
+                enemy.destroy();
             }
             delete gameSprites[data.id];
             stats[stats.length - 1].destroy();
@@ -226,14 +191,15 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
             game.load.spritesheet('button', 'assets/buttons/button.png', 45, 45);
             game.stage.disableVisibilityChange = true;
             
-            Ship.preload();
+            PlayerShip.preload();
+            EnemyShip.preload();
         },
 
         create: function() {
             game.add.sprite(-300, -300, 'bound');
             cursors = game.input.keyboard.createCursorKeys();
-            player = new Ship();
-            player.create('player');
+            player = new PlayerShip();
+            player.create();
             
             enemies = game.add.group();
             shots = game.add.group();
