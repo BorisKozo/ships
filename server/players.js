@@ -13,6 +13,7 @@ module.exports = (function() {
         player.shot = null;
         player.score = 0;
         player.hp = 100;
+        player.deathTimer = 0;
     }
 
     function attachSocketHandlers(player) {
@@ -29,15 +30,15 @@ module.exports = (function() {
             if (keys.up) {
                 logic.moveForward(this.player);
             }
-            
-            if (keys.shoot){
-              if (logic.canShoot(player)){
-                player.shot = {
-                  x:player.x,
-                  y:player.y,
-                  rotation:player.rotation
-                };
-              }
+
+            if (keys.shoot) {
+                if (logic.canShoot(player)) {
+                    player.shot = {
+                        x: player.x,
+                        y: player.y,
+                        rotation: player.rotation
+                    };
+                }
             }
 
             //console.log("keys pressed ", keys);
@@ -56,13 +57,13 @@ module.exports = (function() {
     }
 
     Player.prototype.initialize = function(data) {
-        var name = data.name ? data.name : 'Player '+this.id;
+        var name = data.name ? data.name : 'Player ' + this.id;
         this.name = name;
-        console.log('Initialized player - ', name," (", this.id,')');
+        console.log('Initialized player - ', name, " (", this.id, ')');
         this.socket.emit('server-initialize', {
-          id:this.id,
-          data:players.getCurrentState()
-          });
+            id: this.id,
+            data: players.getCurrentState()
+        });
     };
 
     Player.prototype.getCurrentState = function() {
@@ -73,20 +74,45 @@ module.exports = (function() {
             id: this.id,
             shot: this.shot,
             hp: this.hp,
-            score:this.score,
-            name:this.name
+            score: this.score,
+            name: this.name,
+            deathTimer: this.deathTimer
         };
     };
-    
-    Player.prototype.update = function(){
-      if (this.shot){
-        logic.moveShot(this.shot);
-        if (logic.isShotOutOfBounds(this.shot)){
-          this.shot = null;
+
+    Player.prototype.update = function() {
+        if (this.shot) {
+            logic.moveShot(this.shot);
+            if (logic.isShotOutOfBounds(this.shot)) {
+                this.shot = null;
+            }
         }
-      }
+        
+        if (this.deathTimer){
+            this.deathTimer -= 1;
+        }
     };
 
+    function areColliding(shot, player){
+       return true;    
+    }
+    
+    function doShotsCollisions() {
+        var i, j;
+        for (i = 0; i < playerList.length; i++) {
+            if (!playerList[i].shot) {
+                continue;
+            }
+            for (j = 0; j < playerList.length; j++) {
+                if ((i !== j) && areColliding(playerList[i].shot,playerList[j])){
+                    playerList[i].shot = null;
+                    playerList[i].score += 1;
+                    playerList[i].hp = 100; //Fill the HP of the player who killed someone
+                    playerList[j].deathTimer = 200;
+                }
+            }
+        }
+    }
 
     players = {
         addPlayer: function(socket) {
@@ -106,7 +132,9 @@ module.exports = (function() {
                         break;
                     }
                 }
-                socket.broadcast.emit('server-player-disconnected',{id:player.id});
+                socket.broadcast.emit('server-player-disconnected', {
+                    id: player.id
+                });
             });
 
             return player;
@@ -119,12 +147,14 @@ module.exports = (function() {
             }
             return result;
         },
-        update: function(){
+        update: function() {
             var i;
             for (i = 0; i < playerList.length; i++) {
                 playerList[i].update();
             }
+            doShotsCollisions();
         }
+
     };
     return players;
 }());

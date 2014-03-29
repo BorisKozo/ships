@@ -4,7 +4,6 @@ var players = require('./players');
 
 var socketServer;
 
-
 function gameLoop(){
   players.update();
 	socketServer.sockets.emit('server-state',players.getCurrentState());
