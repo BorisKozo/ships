@@ -12,7 +12,7 @@ define(['Phaser', 'app/game.js'], function(Phaser, game) {
         //  The second gives each particle a 2000ms lifespan
         //  The third is ignored when using burst/explode mode
         //  The final parameter (10) is how many particles will be emitted in this single burst
-        emitter.start(true, 300, null, 300);
+        emitter.start(true, 300, null, 10);
 
     }
 

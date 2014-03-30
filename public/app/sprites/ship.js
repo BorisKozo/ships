@@ -25,6 +25,23 @@ define(['Phaser', 'app/game.js', 'shared/logic.js', './hp_bar', './explosion'], 
             }
         },
         updateState: function(state) {
+            if (state.deathTimer > 0){
+                if (this.ship.alive){
+                    this.ship.kill();
+                    this.hpBar.hide();
+                    if (this.shot){
+                        this.shot.destroy();
+                        this.shot = null;
+                    }
+                    this.explosion.explode(state.x,state.y);
+                }
+                return;
+            } else {
+                if (!this.ship.alive){
+                    this.ship.reset(state.x,state.y);
+                    this.hpBar.show();
+                }
+            }
             this.ship.x = state.x;
             this.ship.y = state.y;
             this.ship.rotation = state.rotation;

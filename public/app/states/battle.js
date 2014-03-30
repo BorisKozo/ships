@@ -1,4 +1,4 @@
-define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js', './../sprites/player_ship', './../sprites/enemy_ship'], function(Phaser, io, math, game, global, logic, PlayerShip, EnemyShip) {
+define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/logic.js', './../sprites/player_ship', './../sprites/enemy_ship','./../sprites/explosion'], function(Phaser, io, math, game, global, logic, PlayerShip, EnemyShip,Explosion) {
 
     var cursors;
     var player;
@@ -193,6 +193,7 @@ define(['Phaser', 'io', 'app/math.js', 'app/game.js', 'app/global.js', 'shared/l
 
             PlayerShip.preload();
             EnemyShip.preload();
+            Explosion.preload();
         },
 
         create: function() {

@@ -93,8 +93,13 @@ module.exports = (function() {
         }
     };
 
+    function withinDistance(x1, y1, x2, y2, distance) {
+      return Math.pow(distance, 2) > (Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+    }
+
+
     function areColliding(shot, player){
-       return true;    
+       return withinDistance(shot.x, shot.y, player.x, player.y, 15);
     }
     
     function doShotsCollisions() {
@@ -104,7 +109,7 @@ module.exports = (function() {
                 continue;
             }
             for (j = 0; j < playerList.length; j++) {
-                if ((i !== j) && areColliding(playerList[i].shot,playerList[j])){
+                if ((i !== j) && playerList[j].deathTimer === 0 && areColliding(playerList[i].shot,playerList[j])){
                     playerList[i].shot = null;
                     playerList[i].score += 1;
                     playerList[i].hp = 100; //Fill the HP of the player who killed someone
