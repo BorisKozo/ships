@@ -116,7 +116,7 @@ module.exports = (function() {
                 continue;
             }
             for (j = 0; j < playerList.length; j++) {
-                if ((i !== j) && playerList[j].deathTimer === 0 && areColliding(playerList[i].shot, playerList[j])) {
+                if ((i !== j) && playerList[j].deathTimer === 0 &&  playerList[i].shot && areColliding(playerList[i].shot, playerList[j])) {
                     shotDamage = randomIntInRange(minShotDamage, maxShotDamage);
                     playerList[j].hp -= shotDamage;
                     playerList[i].shot = null;

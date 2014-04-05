@@ -5,6 +5,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js','./ship','./hp_bar'], functio
     function preload() {
         game.load.image('player-ship', 'assets/sprites/player-ship.png');
         game.load.image('player-shot', 'assets/sprites/player-shot.png');
+        game.load.audio('assets/sounds/shot1', ['assets/sounds/shot1.mp3','assets/sounds/shot1.ogg']);
     }
 
     function create() {
@@ -13,6 +14,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js','./ship','./hp_bar'], functio
         this.ship.anchor.setTo(0.2, 0.5);
         this.shot = null;
         this.type = 'player';
+        this.shotSound = game.add.audio('assets/sounds/shot1');
         
     }
 

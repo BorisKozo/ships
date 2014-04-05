@@ -74,6 +74,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js', './hp_bar', './explosion'], 
             shotSprite.rotation = shotData.rotation;
             shotSprite.serverId = this.serverId;
             this.shot = shotSprite;
+            this.shotSound.play();
         }
     }
 

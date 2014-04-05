@@ -4,6 +4,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js','./ship'], function(Phaser, g
     function preload() {
         game.load.image('enemy-ship', 'assets/sprites/enemy-ship.png');
         game.load.image('enemy-shot', 'assets/sprites/enemy-shot.png');
+        game.load.audio('assets/sounds/shot1', ['assets/sounds/shot1.mp3','assets/sounds/shot1.ogg']);
     }
 
     function create(data) {
@@ -16,6 +17,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js','./ship'], function(Phaser, g
         this.score = data.score;
         this.name = data.name;
         this.type = 'enemy';
+        this.shotSound = game.add.audio('assets/sounds/shot1');
     }
     
     function destroy(){
