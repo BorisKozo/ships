@@ -20,6 +20,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js','./ship'], function(Phaser, g
     
     function destroy(){
         this.ship.destroy();
+        this.hpBar.destroy();
         if (this.shot !== null){
             this.shot.destroy();
             this.shot = null;

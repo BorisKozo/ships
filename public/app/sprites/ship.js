@@ -48,6 +48,7 @@ define(['Phaser', 'app/game.js', 'shared/logic.js', './hp_bar', './explosion'], 
             this.name = state.name;
             this.score = state.score;
             this.hp = state.hp;
+            
             if (state.shot !== null) { //Server thinks there is a shot
                 if (this.shot === null) { //But we have no shot
                     this.shoot(state.shot); //Generate shot

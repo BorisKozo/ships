@@ -3,6 +3,9 @@ module.exports = (function() {
     var players;
     var playerList = [];
     var id = 0;
+    var shipHitzoneRadius = 15;
+    var minShotDamage = 10;
+    var maxShotDamage = 30;
 
 
 
@@ -87,33 +90,43 @@ module.exports = (function() {
                 this.shot = null;
             }
         }
-        
-        if (this.deathTimer){
+
+        if (this.deathTimer) {
             this.deathTimer -= 1;
         }
     };
 
     function withinDistance(x1, y1, x2, y2, distance) {
-      return Math.pow(distance, 2) > (Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+        return Math.pow(distance, 2) > (Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+    }
+
+    function randomIntInRange(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
 
-    function areColliding(shot, player){
-       return withinDistance(shot.x, shot.y, player.x, player.y, 15);
+    function areColliding(shot, player) {
+        return withinDistance(shot.x, shot.y, player.x, player.y, shipHitzoneRadius);
     }
-    
+
     function doShotsCollisions() {
-        var i, j;
+        var i, j, shotDamage;
         for (i = 0; i < playerList.length; i++) {
             if (!playerList[i].shot) {
                 continue;
             }
             for (j = 0; j < playerList.length; j++) {
-                if ((i !== j) && playerList[j].deathTimer === 0 && areColliding(playerList[i].shot,playerList[j])){
+                if ((i !== j) && playerList[j].deathTimer === 0 && areColliding(playerList[i].shot, playerList[j])) {
+                    shotDamage = randomIntInRange(minShotDamage, maxShotDamage);
+                    playerList[j].hp -= shotDamage;
                     playerList[i].shot = null;
-                    playerList[i].score += 1;
-                    playerList[i].hp = 100; //Fill the HP of the player who killed someone
-                    playerList[j].deathTimer = 200;
+                    if (playerList[j].hp <= 0) {
+                        playerList[i].score += 1;
+                        playerList[i].hp = 100; //Fill the HP of the player who killed someone
+                        playerList[j].deathTimer = 200;
+                        playerList[j].shot = null;
+                        playerList[j].hp = 100;
+                    }
                 }
             }
         }
